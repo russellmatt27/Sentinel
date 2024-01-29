@@ -69,8 +69,19 @@ match = re.match(pattern,str(logAnalyticsUri))
 if(not match):
     raise Exception("Google Workspace Reports: Invalid Log Analytics Uri.")
 
-
+##tesing
 def get_credentials():
+    creds = None
+    if pickle_string:
+        try:
+            creds = pickle.loads(pickle_string)
+        except Exception as pickle_read_exception:
+            logging.error('Error while loading pickle string: {}'.format(pickle_read_exception))
+    else:
+        raise Exception("Google Workspace Reports: Pickle_string is empty. Exit.")
+    return creds
+
+def get_credentials1():
     creds = None
     if pickle_string:
         try:
