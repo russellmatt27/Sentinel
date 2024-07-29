@@ -1,5 +1,7 @@
 # Workspace ID for the Log Analytics workspace where the ASim schema and data tests will be conducted
-$global:workspaceId = "e9beceee-7d61-429f-a177-ee5e2b7f481a"
+$global:workspaceId = "8ecf8077-cf51-4820-aadd-14040956f35d"
+#$global:workspaceId = "059f037c-1b3b-42b1-bb90-e340e8c3142c"
+$global:subscriptionId="d1d8779d-38d7-4f06-91db-9cbc8de0176f"
 
 # ANSI escape code for green text
 $green = "`e[32m"
@@ -28,6 +30,7 @@ Class Parser {
 }
 
 function run {
+    $subscription = Select-AzSubscription -SubscriptionId $global:subscriptionId
     Write-Host "This is the script from PR."
     # Check if upstream remote already exists
     $remoteExists = Invoke-Expression "git remote" | Select-String -Pattern "upstream"
@@ -50,16 +53,21 @@ function run {
     # Iterate over the lines
     foreach ($line in $modifiedFilesStatusLines) {
         # Split the line into status and file name
-        $status, $file = $line -split "\t", 2
+        # Splitting the line into parts
+        $parts = $line -split "\t"
+        # Assigning the first part to $status and the last part to $file
+        $status = $parts[0]
+        $file = $parts[-1]  # -1 index refers to the last element
         # Check if the file is a YAML file
         if ($file -like "*.yaml") {
             # Add the file name and status to the array
             $global:modifiedFiles += New-Object PSObject -Property @{
                 Name = $file
-                Status = switch ($status) {
+                Status = switch -Regex ($status) {
                     "A" { "Added" }
                     "M" { "Modified" }
                     "D" { "Deleted" }
+                    "R" { "Renamed" }
                     default { "Unknown" }
                 }
             }
@@ -93,7 +101,7 @@ function testSchema([string] $ParserFile) {
         Write-Host "${yellow}The parser '$functionName' is a union parser, ignoring it from 'Schema' and 'Data' testing.${reset}"
         Write-Host "***************************************************"
     } else {
-        testParser ([Parser]::new($functionName, $parsersAsObject.ParserQuery, $Schema.Replace("Parsers/ASim", ""), $parsersAsObject.ParserParams))
+        testParser ([Parser]::new($functionName, $parsersAsObject.ParserQuery, $Schema.Replace("Parsers\ASim", ""), $parsersAsObject.ParserParams))
     }
 }
 

@@ -16,7 +16,11 @@ import csv
 DUMMY_VALUE = "\'!not_REAL_vAlUe\'"
 MAX_FILTERING_PARAMETERS = 2
 # Workspace ID for the Log Analytics workspace where the ASim filtering tests will be performed.
-WORKSPACE_ID = "e9beceee-7d61-429f-a177-ee5e2b7f481a"
+#WORKSPACE_ID = "e9beceee-7d61-429f-a177-ee5e2b7f481a"
+# eco-connector
+#WORKSPACE_ID = "059f037c-1b3b-42b1-bb90-e340e8c3142c"
+# CyberSOC
+WORKSPACE_ID = "8ecf8077-cf51-4820-aadd-14040956f35d"
 # Timespan for the parser query
 TIME_SPAN_IN_DAYS = 7
 
@@ -24,7 +28,7 @@ TIME_SPAN_IN_DAYS = 7
 exclusion_file_path = '.script/tests/asimParsersTest/ExclusionListForASimTests.csv'
 
 # Sentinel Repo URL
-SentinelRepoUrl = f"https://github.com/Azure/Azure-Sentinel.git"
+SentinelRepoUrl = "https://github.com/Azure/Azure-Sentinel.git"
 
 # Negative value as it is cannot be a port number and less likely to be an ID of some event. Also, the absolute value is greater than the maximal possible port number.
 INT_DUMMY_VALUE = -967799
@@ -238,11 +242,11 @@ def main():
     git_remote_command = "git remote"
     remote_result = subprocess.run(git_remote_command, shell=True, text=True, capture_output=True, check=True)
     if 'upstream' not in remote_result.stdout.split():
-        git_add_upstream_command = f"git remote add upstream '{SentinelRepoUrl}'"
+        git_add_upstream_command = f"git remote add upstream {SentinelRepoUrl}"
         subprocess.run(git_add_upstream_command, shell=True, text=True, capture_output=True, check=True)
     # Fetch from upstream
     git_fetch_upstream_command = "git fetch upstream"
-    subprocess.run(git_fetch_upstream_command, shell=True, text=True, capture_output=True, check=True)
+    subprocess.run(git_fetch_upstream_command, shell=True, text=True, capture_output=True)#, check=True)
 
     GetModifiedFiles = f"git diff --name-only upstream/master {current_directory}/../../../Parsers/"
     try:
